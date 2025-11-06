@@ -1,9 +1,9 @@
-{{-- SECTION: Angka Kunci Stunting --}}
-<section class="bg-slate-50 py-14 sm:py-20">
+{{-- SECTION: Angka Kunci Stunting (AOS + Counter) --}}
+<section class="bg-slate-50 py-14 sm:py-20" data-aos="fade-up" data-aos-offset="100">
     <div class="mx-auto grid max-w-7xl items-start gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
 
         {{-- LEFT: headline --}}
-        <div>
+        <div data-aos="fade-up" data-aos-delay="0">
             <h2 class="text-3xl font-bold leading-tight text-slate-800 sm:text-4xl">
                 Mempercepat penurunan
                 <span class="block text-[#56ced6]">stunting secara terukur</span>
@@ -17,6 +17,7 @@
 
         {{-- RIGHT: metric tiles --}}
         <div class="grid w-full grid-cols-1 gap-6 sm:grid-cols-2">
+
             @php
                 $fallback = [
                     [
@@ -25,6 +26,7 @@
                         'value' => 218,
                         'suffix' => '‰',
                         'help' => 'per 1000 balita (contoh)',
+                        'dur' => 1200,
                     ],
                     [
                         'icon' => 'child',
@@ -32,6 +34,7 @@
                         'value' => 1490000,
                         'suffix' => '',
                         'help' => 'nasional (contoh)',
+                        'dur' => 1400,
                     ],
                     [
                         'icon' => 'drop',
@@ -39,6 +42,7 @@
                         'value' => 72,
                         'suffix' => '%',
                         'help' => 'PMT, vitamin, dsb.',
+                        'dur' => 1200,
                     ],
                     [
                         'icon' => 'hospital',
@@ -46,13 +50,15 @@
                         'value' => 64,
                         'suffix' => '%',
                         'help' => 'ibu hamil & nifas',
+                        'dur' => 1200,
                     ],
                 ];
                 $data = isset($stats) && is_iterable($stats) && count($stats) ? $stats : $fallback;
             @endphp
 
             @foreach ($data as $i => $s)
-                <div class="flex items-start gap-4 rounded-2xl bg-white p-5 ring-1 ring-inset ring-slate-200 shadow-sm">
+                <div class="flex items-start gap-4 rounded-2xl bg-white p-5 ring-1 ring-inset ring-slate-200 shadow-sm transition hover:shadow-md"
+                    data-aos="fade-up" data-aos-delay="{{ $i * 100 }}">
                     {{-- icon --}}
                     <div
                         class="mt-1 inline-flex h-10 w-10 flex-none items-center justify-center rounded-lg bg-[#56ced6]/15 text-[#56ced6]">
@@ -93,8 +99,10 @@
                     {{-- numbers --}}
                     <div>
                         <div class="text-2xl font-bold text-slate-800">
-                            <span class="counter"
-                                data-target="{{ (int) ($s['value'] ?? 0) }}">{{ number_format((int) ($s['value'] ?? 0)) }}</span>
+                            <span class="counter" data-target="{{ (int) ($s['value'] ?? 0) }}"
+                                data-duration="{{ (int) ($s['dur'] ?? 1200) }}">
+                                {{ number_format(0) }}
+                            </span>
                             <span>{{ $s['suffix'] ?? '' }}</span>
                         </div>
                         <div class="text-sm font-medium text-slate-800">{{ $s['label'] ?? '-' }}</div>
@@ -104,6 +112,7 @@
                     </div>
                 </div>
             @endforeach
+
         </div>
     </div>
 </section>

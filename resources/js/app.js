@@ -8,6 +8,29 @@ import "chartjs-adapter-date-fns";
 import Swiper from "swiper/bundle";
 import "swiper/css/bundle";
 
+import AOS from "aos";
+import "aos/dist/aos.css";
+
+function initAOS() {
+    try {
+        if (!window.__aosInited) {
+            AOS.init({
+                duration: 800,
+                easing: "ease-out-cubic",
+                once: true,
+                offset: 0, // 🔑 dari 80 → 0
+                mirror: false,
+                startEvent: "load", // 🔑 nunggu semua asset siap
+            });
+            window.__aosInited = true;
+        } else {
+            AOS.refreshHard();
+        }
+    } catch (e) {
+        console.error("AOS init failed:", e);
+    }
+}
+
 // ===== util: destroy chart kalau sudah ada
 function makeOrUpdateChart(el, config) {
     const existing = Chart.getChart(el);
@@ -150,24 +173,80 @@ window.initFaqAccordion = () => {
     });
 };
 
-// ===== panggil saat load & saat Livewire swap
+// ===== Counter (0 -> target) saat terlihat
+function animateCounter(el) {
+    if (el.dataset._countDone === "1") return;
+
+    const target = parseInt(el.dataset.target || "0", 10);
+    const duration = parseInt(el.dataset.duration || "1200", 10);
+    const fmt = new Intl.NumberFormat("id-ID");
+    const start = performance.now();
+
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+    function frame(now) {
+        const elapsed = now - start;
+        const p = Math.min(1, elapsed / duration);
+        const eased = easeOutCubic(p);
+        const val = Math.round(target * eased);
+        el.textContent = fmt.format(val);
+        if (p < 1) {
+            requestAnimationFrame(frame);
+        } else {
+            el.textContent = fmt.format(target); // snap ke target pas akhir
+            el.dataset._countDone = "1";
+        }
+    }
+    requestAnimationFrame(frame);
+}
+
+window.initCountersOnView = () => {
+    const counters = document.querySelectorAll(".counter");
+    if (!counters.length) return;
+
+    const io = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((e) => {
+                if (!e.isIntersecting) return;
+                animateCounter(e.target);
+                io.unobserve(e.target); // sekali saja
+            });
+        },
+        { threshold: 0.3 }
+    );
+
+    counters.forEach((c) => io.observe(c));
+};
+
 document.addEventListener(
     "DOMContentLoaded",
     () => {
+        initAOS();
         window.renderCharts();
         window.initNewsSwiper();
         window.initFaqAccordion();
+        window.initCountersOnView();
     },
     { once: true }
 );
+
+window.addEventListener("load", () => {
+    initAOS(); // in case belum
+    AOS.refreshHard(); // pastikan posisi recalculated setelah gambar kebuka
+});
 
 document.addEventListener("livewire:navigated", () => {
     window.renderCharts();
     window.initNewsSwiper();
     window.initFaqAccordion();
+    window.initCountersOnView();
+    AOS.refreshHard();
 });
+
 document.addEventListener("livewire:update", () => {
     window.renderCharts();
     window.initNewsSwiper();
     window.initFaqAccordion();
+    window.initCountersOnView();
+    AOS.refreshHard();
 });

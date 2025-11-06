@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class Post extends Model
 {
@@ -66,11 +67,6 @@ class Post extends Model
         return $slug;
     }
 
-    // Status scopes
-    public function scopePublished($q)
-    {
-        return $q->where('is_published', true)->where('published_at', '<=', now());
-    }
     public function scopeScheduled($q)
     {
         return $q->where('is_published', true)->where('published_at', '>',  now());
@@ -99,5 +95,27 @@ class Post extends Model
     public function getPublishedAtLocalAttribute()
     {
         return $this->published_at; // sudah WIB, tinggal format
+    }
+
+    /** Scope: hanya yang publish & waktunya sudah lewat */
+    public function scopePublished($q)
+    {
+        return $q->where('is_published', 1)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
+    }
+
+    /** Helper: URL gambar cover */
+    public function getCoverUrlAttribute()
+    {
+        if (!$this->cover_image) {
+            return asset('images/placeholder.jpg'); // siapkan placeholder opsional
+        }
+        // kalau kamu simpan path via Storage (public disk):
+        if (str_starts_with($this->cover_image, 'covers/') || str_starts_with($this->cover_image, 'public/')) {
+            return Storage::url($this->cover_image);
+        }
+        // kalau sudah URL absolut atau path public:
+        return asset($this->cover_image);
     }
 }

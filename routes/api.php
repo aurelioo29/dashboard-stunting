@@ -1,9 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PostApiController;
+use App\Http\Controllers\Api\PredictionController; // <-- GANTI INI
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\PostApiController; // <-- TAMBAH INI
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +22,7 @@ Route::get('/ping', function () {
 });
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login',    [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login']);
 
 /*
 |--------------------------------------------------------------------------
@@ -31,7 +32,7 @@ Route::post('/login',    [AuthController::class, 'login']);
 | Kalau mau wajib login, nanti bisa dipindah ke dalam group auth:sanctum.
 */
 
-Route::get('/posts',        [PostApiController::class, 'index']);
+Route::get('/posts', [PostApiController::class, 'index']);
 Route::get('/posts/{slug}', [PostApiController::class, 'show'])
     ->where('slug', '.*'); // kalau slug-nya ada strip / karakter khusus
 
@@ -48,7 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', function (Request $request) {
         return response()->json([
             'success' => true,
-            'data'    => $request->user(),
+            'data' => $request->user(),
         ]);
     });
 
@@ -71,8 +72,8 @@ Route::middleware('auth:sanctum')->group(function () {
                 'success' => true,
                 'message' => 'Data khusus admin',
                 'data' => [
-                    'total_users'  => \App\Models\User::count(),
-                    'timestamp'    => now()->toDateTimeString(),
+                    'total_users' => \App\Models\User::count(),
+                    'timestamp' => now()->toDateTimeString(),
                 ],
             ]);
         });
@@ -91,17 +92,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role:user')->group(function () {
 
-        // Contoh: profile user (orang tua)
         Route::get('/user/profile', function (Request $request) {
             return response()->json([
                 'success' => true,
-                'data'    => $request->user(),
+                'data' => $request->user(),
             ]);
         });
 
-        // Nanti di sini kamu buat:
-        // Route::get('/anak', [AnakController::class, 'index']);
-        // Route::post('/prediksi', [PrediksiController::class, 'store']);
-        // dst.
+        // Simpan hasil prediksi
+        Route::post('/prediksi', [PredictionController::class, 'store']);
     });
+
 });

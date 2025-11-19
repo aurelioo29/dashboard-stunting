@@ -37,6 +37,10 @@ new class extends Component {
                     <x-nav-link :href="route('dashboard.posts.index')" :active="request()->routeIs('dashboard.posts.*')" wire:navigate>
                         {{ __('Posts') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('dashboard.services.index')" :active="request()->routeIs('dashboard.services.*')" wire:navigate>
+                        {{ __('Services') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -99,6 +103,9 @@ new class extends Component {
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('dashboard.posts.index')" :active="request()->routeIs('dashboard.posts.*')" wire:navigate>
                 {{ __('Posts') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('dashboard.services.index')" :active="request()->routeIs('dashboard.services.*')" wire:navigate>
+                {{ __('Services') }}
             </x-responsive-nav-link>
         </div>
 

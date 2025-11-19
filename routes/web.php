@@ -12,15 +12,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
-        // LIST (tabel saja)
+        // POSTS
         Route::view('/posts', 'posts.index')->name('posts.index');
-
-        // CREATE (form)
         Route::view('/posts/create', 'posts.create')->name('posts.create');
-
-        // EDIT (form) — pakai route parameter {post}
         Route::view('/posts/{post}/edit', 'posts.edit')->name('posts.edit')
             ->whereNumber('post');
+
+        // SERVICES
+        Route::view('/services', 'services.index')->name('services.index');
+        Route::view('/services/create', 'services.create')->name('services.create');
+        Route::view('/services/{service}/edit', 'services.edit')->name('services.edit')
+            ->whereNumber('service');
     });
 });
 
